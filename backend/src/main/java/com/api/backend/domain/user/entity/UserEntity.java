@@ -46,6 +46,9 @@ public class UserEntity {
     @Column(name = "USER_SOCIAL_PROVIDER_TYPE")
     private UserSocialProviderType userSocialProviderType;
 
+    @Column(name = "USER_SOCIAL_ID")
+    private String userSocialId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "USER_ROLE", nullable = false)
     private UserRoleType userRoleType;

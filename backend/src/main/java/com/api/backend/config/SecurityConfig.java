@@ -3,7 +3,6 @@ package com.api.backend.config;
 import com.api.backend.filter.CustomUserJsonLoginFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,13 +25,16 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final ObjectMapper objectMapper;
     private final AuthenticationSuccessHandler loginSuccessHandler;
+    private final AuthenticationSuccessHandler socialSuccessHandler;
 
     public SecurityConfig(AuthenticationConfiguration authenticationConfiguration,
                           ObjectMapper objectMapper,
-                          @Qualifier("LoginSuccessHandler") AuthenticationSuccessHandler loginSuccessHandler) {
+                          @Qualifier("LoginSuccessHandler") AuthenticationSuccessHandler loginSuccessHandler,
+                          @Qualifier("SocialSuccessHandler") AuthenticationSuccessHandler socialSuccessHandler) {
         this.authenticationConfiguration = authenticationConfiguration;
         this.objectMapper = objectMapper;
         this.loginSuccessHandler = loginSuccessHandler;
+        this.socialSuccessHandler = socialSuccessHandler;
     }
 
     // 비밀번호 단방향(BCrypt) 암호화용 Bean
@@ -58,6 +60,10 @@ public class SecurityConfig {
 
         http
                 .httpBasic(AbstractHttpConfigurer::disable);
+
+        http
+                .oauth2Login(oauth2 -> oauth2
+                        .successHandler(socialSuccessHandler));
 
         http
                 .authorizeHttpRequests(auth -> auth
