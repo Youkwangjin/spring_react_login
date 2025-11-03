@@ -54,6 +54,67 @@ public class SecurityConfig {
         this.jwtFilter = jwtFilter;
     }
 
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+        http
+                .csrf(AbstractHttpConfigurer::disable);
+
+        http
+                .formLogin(AbstractHttpConfigurer::disable);
+
+        http
+                .httpBasic(AbstractHttpConfigurer::disable);
+
+        http
+                .oauth2Login(oauth2 -> oauth2
+                        .successHandler(socialSuccessHandler));
+
+        http
+                .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/jwt/exchange", "/jwt/refresh").permitAll()
+                .requestMatchers(HttpMethod.POST, "/user/exist", "/user").permitAll()
+                .requestMatchers("/api/v1/users/**").hasRole("USER")
+                .anyRequest().permitAll()
+        );
+
+        http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()));
+
+
+        http
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                        })
+                );
+
+        // 세션 필터 설정 (STATELESS)
+        http
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        http
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
+        http
+                .addFilterBefore(new CustomUserJsonLoginFilter(authenticationManager(authenticationConfiguration), objectMapper, loginSuccessHandler),
+                UsernamePasswordAuthenticationFilter.class);
+
+        http
+                .logout(logout -> logout
+                .logoutUrl("/api/auth/logout")
+                .addLogoutHandler(refreshTokenLogoutHandler)
+                .logoutSuccessHandler((req, res, auth) -> res.setStatus(HttpServletResponse.SC_NO_CONTENT))
+        );
+
+
+        return http.build();
+    }
+
     // 비밀번호 단방향(BCrypt) 암호화용 Bean
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -87,69 +148,5 @@ public class SecurityConfig {
         return RoleHierarchyImpl.withRolePrefix("ROLE_")
                 .role(UserRoleType.ADMIN.name()).implies(UserRoleType.USER.name())
                 .build();
-    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        http
-                .csrf(AbstractHttpConfigurer::disable);
-
-        http
-                .formLogin(AbstractHttpConfigurer::disable);
-
-        http
-                .httpBasic(AbstractHttpConfigurer::disable);
-
-        http
-                .oauth2Login(oauth2 -> oauth2
-                        .successHandler(socialSuccessHandler));
-
-        http
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll());
-
-        http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()));
-
-        http
-                .exceptionHandling(e -> e
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-                        })
-                        .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            response.sendError(HttpServletResponse.SC_FORBIDDEN);
-                        })
-                );
-
-        // 세션 필터 설정 (STATELESS)
-        http
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-        http
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
-        http
-                .addFilterBefore(new CustomUserJsonLoginFilter(authenticationManager(authenticationConfiguration), objectMapper, loginSuccessHandler),
-                UsernamePasswordAuthenticationFilter.class);
-
-        http
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/jwt/exchange", "/jwt/refresh").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/user/exist", "/user").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/users").hasRole(UserRoleType.USER.name())
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/users").hasRole(UserRoleType.USER.name())
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/users").hasRole(UserRoleType.USER.name())
-                        .anyRequest().permitAll()
-                );
-
-        http.logout(logout -> logout
-                .logoutUrl("/api/auth/logout")
-                .addLogoutHandler(refreshTokenLogoutHandler)
-                .logoutSuccessHandler((req, res, auth) -> res.setStatus(HttpServletResponse.SC_NO_CONTENT))
-        );
-
-        return http.build();
     }
 }
