@@ -11,6 +11,14 @@ public enum ApiErrorCode {
     USER_PASSWORD_ERROR(HttpStatus.BAD_REQUEST,             "1002", "비밀번호가 일치하지 않습니다."),
     USER_FOUND_ERROR(HttpStatus.NOT_FOUND,                  "2000", "존재하지 않는 사용자 입니다."),
 
+    JWT_TOKEN_MISSING(HttpStatus.UNAUTHORIZED,              "3000", "JWT 토큰이 존재하지 않습니다."),
+    JWT_TOKEN_INVALID(HttpStatus.UNAUTHORIZED,              "3001", "유효하지 않은 JWT 토큰입니다."),
+    JWT_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED,              "3002", "JWT 토큰이 만료되었습니다."),
+    REFRESH_TOKEN_MISSING(HttpStatus.BAD_REQUEST,           "3003", "리프레시 토큰이 요청에 포함되어 있지 않습니다."),
+    REFRESH_TOKEN_INVALID(HttpStatus.UNAUTHORIZED,          "3004", "유효하지 않은 리프레시 토큰입니다."),
+    REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED,          "3005", "리프레시 토큰이 만료되었습니다."),
+    COOKIE_NOT_FOUND(HttpStatus.BAD_REQUEST,                "3006", "쿠키가 존재하지 않습니다."),
+
     BAD_REQUEST_ERROR(HttpStatus.BAD_REQUEST,               "9001", "잘못된 요청입니다."),
     UNAUTHORIZED_ERROR(HttpStatus.UNAUTHORIZED,             "9002", "로그인 후 이용 가능합니다."),
     FORBIDDEN_ERROR(HttpStatus.FORBIDDEN,                   "9003", "접근 권한이 없습니다."),
