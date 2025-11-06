@@ -3,6 +3,7 @@ package com.api.backend.domain.user.service;
 import com.api.backend.code.ApiErrorCode;
 import com.api.backend.domain.jwt.service.JwtService;
 import com.api.backend.domain.user.dto.request.UserDeleteReqDTO;
+import com.api.backend.domain.user.dto.request.UserEmailReqDTO;
 import com.api.backend.oauth2.CustomOAuth2User;
 import com.api.backend.domain.user.dto.request.UserJoinReqDTO;
 import com.api.backend.domain.user.dto.request.UserUpdateReqDTO;
@@ -42,6 +43,17 @@ public class UserService extends DefaultOAuth2UserService implements UserDetails
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final JwtService jwtService;
+
+    @Transactional(readOnly = true)
+    public void existsUserByEmail(UserEmailReqDTO request) {
+        final String userEmail = request.getUserEmail();
+
+        Boolean exists = userRepository.existsByUserEmail(userEmail);
+
+        if (exists) {
+            throw new BackendException(ApiErrorCode.USER_EMAIL_DUPLICATED);
+        }
+    }
 
     @Transactional(readOnly = true)
     public Boolean existsUserById(Integer userId) {

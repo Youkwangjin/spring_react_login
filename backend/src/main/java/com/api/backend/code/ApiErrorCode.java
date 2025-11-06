@@ -9,6 +9,7 @@ public enum ApiErrorCode {
     USER_AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED,     "1000", "이메일 또는 비밀번호가 올바르지 않습니다."),
     USER_ALREADY_EXISTS(HttpStatus.CONFLICT,                "1001", "이미 가입한 사용자입니다."),
     USER_PASSWORD_ERROR(HttpStatus.BAD_REQUEST,             "1002", "비밀번호가 일치하지 않습니다."),
+    USER_EMAIL_DUPLICATED(HttpStatus.CONFLICT,              "1003", "이미 사용 중인 이메일입니다."),
     USER_FOUND_ERROR(HttpStatus.NOT_FOUND,                  "2000", "존재하지 않는 사용자 입니다."),
 
     JWT_TOKEN_MISSING(HttpStatus.UNAUTHORIZED,              "3000", "JWT 토큰이 존재하지 않습니다."),

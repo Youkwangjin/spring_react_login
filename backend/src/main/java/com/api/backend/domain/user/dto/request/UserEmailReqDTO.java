@@ -9,12 +9,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UserLoginReqDTO {
+public class UserEmailReqDTO {
 
     @NotBlank
     @Size(max = 100)
     private String userEmail;
-
-    @NotBlank
-    private String userPassword;
 }

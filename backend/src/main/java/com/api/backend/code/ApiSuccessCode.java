@@ -10,6 +10,8 @@ public enum ApiSuccessCode {
     USER_DELETE_SUCCESS(HttpStatus.OK,          "0002", "그동안 이용해 주셔서 감사합니다."),
     USER_UPDATE_SUCCESS(HttpStatus.OK,          "0003", "회원정보가 성공적으로 수정되었습니다."),
 
+    USER_EMAIL_AVAILABLE(HttpStatus.OK,         "0004", "사용 가능한 이메일입니다."),
+
     LOGIN_SUCCESS(HttpStatus.OK,                "0000", "로그인이 정상적으로 완료되었습니다."),
     ;
 
